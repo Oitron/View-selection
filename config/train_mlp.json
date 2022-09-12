@@ -1,0 +1,36 @@
+{
+    "train_set" : {
+        "data_path" : [
+            "DATA/NXD/fondBleu/valid"
+        ],
+        "num_classes" : 7,
+        "num_objects" : 1,
+        "num_views"   : 48
+    },
+
+    "eval_set" : {
+        "data_path" : [
+            "DATA/XD/fondGris/valid"
+        ],
+        "num_classes" : 7,
+        "num_objects" : 1,
+        "num_views"   : 48
+    },
+
+    "score_file" : "../score_analysis/score_s_tir_fit.npy",
+    "num_execution" : 1,
+    "training_type": "random",
+    "train_size_per_class": 4,
+    "eval_size_per_class" : 3,
+    "cross_view" : "union",
+    "model_save_dir" : "saved_models/fix_6_layers",
+
+    "hyperparameters" : {
+        "model" : "mobilenet",
+        "num_epochs" : 50,
+        "batch_size" : 8,
+        "learning_rate" : 1e-4,
+        "nb_layer_fix" : 6,
+        "cosine_annealing" : false
+    }
+}

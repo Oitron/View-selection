@@ -1,0 +1,29 @@
+{
+    "train_set" : {
+        "data_path" : [
+            "DATA/NXD/fondBleu/valid"
+        ],
+        "num_classes" : 7,
+        "num_objects" : 1,
+        "num_views"   : 48
+    },
+
+    "test_set" : {
+        "data_path" : [
+            "DATA/XD/fondGris/valid"
+        ],
+        "num_classes" : 7,
+        "num_objects" : 1,
+        "num_views"   : 48
+    },
+
+    "score_file" : "../score_analysis/score_s_tir_fit.npy",
+    "num_execution" : 1,
+    "training_type": "top",
+    "train_size_per_class": 7,
+    "test_size_per_class" : 10,
+    "cross_view" : "union",
+
+    "weights_files_dir" : "saved_models/fix_6_layers/trainSize_7/top",
+    "nb_layer_fix" : 6
+}
