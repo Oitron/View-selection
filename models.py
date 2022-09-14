@@ -30,10 +30,12 @@ class MobileNet(nn.Module):
         return x
 
 class SqueezeNet(nn.Module):
-    def __init__(self, num_classes=7):
+    def __init__(self, num_classes=7, nb_layer_fix=12):
         super(SqueezeNet, self).__init__()
         net = torchvision.models.squeezenet1_1(pretrained=True)
-        self.features = net.features
+        self.features = net.features[:nb_layer_fix]
+        self.train_features = net.features[nb_layer_fix:]
+        #self.features = net.features
         self.classifier = nn.Sequential(
             nn.Dropout(p=0.2, inplace=False),
             nn.Conv2d(
@@ -45,7 +47,9 @@ class SqueezeNet(nn.Module):
         )
     def forward(self, x):
         x = self.features(x)
-        print("shape: ", x.shape)
+        #print("shape1: ", x.shape)
+        x = self.train_features(x)
+        #print("shape2: ", x.shape)
         x = self.classifier(x)
         #print("shape after classifier: ", x.shape)
         x = x.view(x.size()[0], -1)
@@ -53,10 +57,12 @@ class SqueezeNet(nn.Module):
         return x
 
 class MnasNet(nn.Module):
-    def __init__(self, num_classes=7):
+    def __init__(self, num_classes=7, nb_layer_fix=16):
         super(MnasNet, self).__init__()
         net = torchvision.models.mnasnet1_0(pretrained=True)
-        self.features = net.layers
+        self.features = net.layers[:nb_layer_fix]
+        self.train_features = net.layers[nb_layer_fix:]
+        #self.features = net.layers
         self.avg_pooling = nn.AdaptiveAvgPool2d(output_size=(1,1))
         self.classifier = nn.Sequential(
             nn.Dropout(p=0.2, inplace=True),
@@ -66,7 +72,9 @@ class MnasNet(nn.Module):
         )
     def forward(self, x):
         x = self.features(x)
-        print("shape: ", x.shape)
+        #print("shape1: ", x.shape)
+        x = self.train_features(x)
+        #print("shape2: ", x.shape)
         x = self.avg_pooling(x)
         #print("shape after features: ", x.shape)
         x = x.view(x.size()[0], -1)
@@ -75,10 +83,12 @@ class MnasNet(nn.Module):
         return x
 
 class DenseNet(nn.Module):
-    def __init__(self, num_classes=7):
+    def __init__(self, num_classes=7, nb_layer_fix=11):
         super(DenseNet, self).__init__()
         net = torchvision.models.densenet121(pretrained=True)
-        self.features = net.features
+        self.features = net.features[:nb_layer_fix]
+        self.train_features = net.features[nb_layer_fix:]
+        #self.features = net.features
         self.avg_pooling = nn.AdaptiveAvgPool2d(output_size=(1,1))
         self.classifer = nn.Sequential(
             nn.Linear(in_features=1024, out_features=256, bias=True),
@@ -87,7 +97,9 @@ class DenseNet(nn.Module):
         )
     def forward(self, x):
         x = self.features(x)
-        print("shape: ", x.shape)
+        #print("shape1: ", x.shape)
+        x = self.train_features(x)
+        #print("shape2: ", x.shape)
         x = self.avg_pooling(x)
         #print("shape after features: ", x.shape)
         x = x.view(x.size()[0], -1)
@@ -96,10 +108,10 @@ class DenseNet(nn.Module):
         return x
 
 class ResNet(nn.Module):
-    def __init__(self, num_classes=7):
+    def __init__(self, num_classes=7, nb_layer_fix=8):
         super(ResNet, self).__init__()
         net = torchvision.models.resnet18(pretrained=True)
-        self.features = nn.Sequential(
+        features_init = nn.Sequential(
             net.conv1,
             net.bn1,
             net.relu,
@@ -109,6 +121,8 @@ class ResNet(nn.Module):
             net.layer3,
             net.layer4,
         )
+        self.features = features_init[:nb_layer_fix]
+        self.train_features = features_init[nb_layer_fix:]
         self.avg_pooling = nn.AdaptiveAvgPool2d(output_size=(1,1))
         self.classifier = nn.Sequential(
             nn.Linear(in_features=512, out_features=num_classes, bias=True),
@@ -117,7 +131,9 @@ class ResNet(nn.Module):
         )
     def forward(self, x):
         x = self.features(x)
-        print("shape: ", x.shape)
+        #print("shape1: ", x.shape)
+        x = self.train_features(x)
+        #print("shape2: ", x.shape)
         x = self.avg_pooling(x)
         x = x.view(x.size()[0], -1)
         x = self.classifier(x)
@@ -125,10 +141,10 @@ class ResNet(nn.Module):
 
 # auxiliary classifiers close
 class InceptionV3(nn.Module):
-    def __init__(self, num_classes=7):
+    def __init__(self, num_classes=7, nb_layer_fix=18):
         super(InceptionV3, self).__init__()
         net = torchvision.models.inception_v3(pretrained=True)
-        self.features = nn.Sequential(
+        features_init = nn.Sequential(
             net.Conv2d_1a_3x3,
             net.Conv2d_2a_3x3,
             net.Conv2d_2b_3x3,
@@ -148,6 +164,8 @@ class InceptionV3(nn.Module):
             net.Mixed_7b,
             net.Mixed_7c,
         )
+        self.features = features_init[:nb_layer_fix]
+        self.train_features = features_init[nb_layer_fix:]
         self.avg_pooling = nn.AdaptiveAvgPool2d(output_size=(1,1))
         self.classifier = nn.Sequential(
             nn.Dropout(p=0.5, inplace=False),
@@ -157,7 +175,9 @@ class InceptionV3(nn.Module):
         )
     def forward(self, x):
         x = self.features(x)
-        print("shape: ", x.shape)
+        #print("shape1: ", x.shape)
+        x = self.train_features(x)
+        #print("shape2: ", x.shape)
         #print("shape after features: ", x.shape)
         x = self.avg_pooling(x)
         x = x.view(x.size()[0], -1)

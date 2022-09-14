@@ -134,3 +134,30 @@ def get_img_feature(img, model, nb_layer_fix, num_layer_ex, transform, device="c
     output = input
     feature_maps = output.squeeze(0).cpu().detach()
     return feature_maps.numpy().flatten()
+
+
+
+
+# feature extraction
+# extract features for an image
+'''
+    feature_maps: flattened (feature vector) 
+'''
+def get_img_feature_score(img, model, num_layer_ex, transform, device="cuda"):
+    '''
+        img: image(np array)
+        model: net(mobilenet)
+        num_layer: index of layer for feature extraction
+        transform: preprocess
+        device: "cpu"/"cuda"
+    '''
+    model.to(device)
+    img_batch = transform(img).unsqueeze(0)
+    input = img_batch.to(device)
+    for i in range(num_layer_ex):
+        layer = model.features[i]
+        output = layer(input)
+        input = output
+    output = input
+    feature_maps = output.squeeze(0).cpu().detach()
+    return feature_maps.numpy().flatten()

@@ -21,7 +21,7 @@ import random
 from tqdm.notebook import tqdm
 
 from dataset import Dataset
-from tools import get_img_feature, compute_FMscores_global, compute_FMscores_local
+from tools import get_img_feature_score, compute_FMscores_global, compute_FMscores_local
 
 import json
 
@@ -116,11 +116,11 @@ def cluster_pipeline(indices, dataset:Dataset, model, num_layer, transform, devi
     for ind in indices:
         img, gt_label, _ = dataset.get_view(index=ind)
         gt_labels.append(gt_label)
-        feature = get_img_feature(img=img,
-                                  model=model,
-                                  num_layer_ex=num_layer,
-                                  transform=transform,
-                                  device=device)
+        feature = get_img_feature_score(img=img,
+                                        model=model,
+                                        num_layer_ex=num_layer,
+                                        transform=transform,
+                                        device=device)
         #print(feature.shape)
         features.append(feature)
     gt_labels = np.array(gt_labels)
